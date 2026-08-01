@@ -5,9 +5,10 @@ import json
 book = json.load(open('行道论.json', encoding='utf-8'))
 chapters = book['content']
 
+# 目录只显示正文章节（chapter=0 的前言/总章不进目录）
 chips = '\n'.join(
     f'                <a class="chapter-chip" href="./道德经.html">第{ch["chapter"]}章 · {ch["title"]}</a>'
-    for ch in chapters
+    for ch in chapters if ch['chapter'] != 0
 )
 
 html = f'''<!DOCTYPE html>

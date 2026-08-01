@@ -497,6 +497,7 @@
         #cards-container{--fs:1.2rem}
         #cards-container .section-text{font-size:var(--fs)!important}
         #cards-container .note-item{font-size:calc(var(--fs) - 0.25rem)!important}
+        .poem-card .section-text{font-style:italic}
         .chapter-nav{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:var(--weapp-capsule-bg);backdrop-filter:blur(8px);border:1px solid var(--weapp-nav-border);border-radius:24px;padding:6px 8px;z-index:95;box-shadow:0 4px 16px rgba(0,0,0,0.15);white-space:nowrap}
         .chapter-nav button{background:transparent;border:none;color:var(--primary-color);font-family:'KaiTi','楷体',serif;font-size:0.85rem;padding:6px 12px;border-radius:16px;cursor:pointer;transition:background .2s}
         .chapter-nav button:hover{background:var(--label-bg-color)}
@@ -630,6 +631,34 @@
     "description": "新版-行道论：对《道德经》的逐章再阐释"
   },
   "content": [
+    {
+      "chapter": 0,
+      "title": "前言",
+      "sections": {
+        "content": [
+          {
+            "label": "正文",
+            "text": "万物在不断聚散中，构建了宏观的主体结构。这些结构有的松散如灰，有的稳定又能自我创造。我们把存续下来能被观察到的称之为体，把维持主体存续的要素称为力，把体与力的结合称为能，把生成体与力的过程称之为得，反之为失。得与失的过程，就是生存与发展的过程。\n\n生存与发展是每个主体的天然需求。为了避免冲突，人们尝试在保障生存的同时，根据迫切程度轮流发展。即此，发展问题似乎已经解决，但需求和欲望、内部和外部、局部与整体之间的博弈远未停止。\n\n从实践的角度看，人是劳动和价值判断的主体，二者在实事上构建了以需求和欲望为目标的结构关系。为了更好地呈现这一过程，行道论完善了天地、玄衡、有无、得施、善与等概念。由此，道与德、得与施、失与事、有与无徐徐展开。"
+          }
+        ],
+        "notes": [],
+        "remarks": []
+      }
+    },
+    {
+      "chapter": 0,
+      "title": "总章",
+      "sections": {
+        "content": [
+          {
+            "label": "正文",
+            "text": "一片动机，一片叶，\n\n一片春绿，迎来期望；一片秋黄，四顾茫茫。\n\n夏至献给祖国，慈悲传于后世。"
+          }
+        ],
+        "notes": [],
+        "remarks": []
+      }
+    },
     {
       "chapter": "一",
       "title": "道之门",
@@ -3320,7 +3349,7 @@
                     els.chapterList.innerHTML = state.currentBook.content.map((chapter, index) => `
                         <li class="chapter-item ${index === state.currentChapterIndex ? 'current' : ''}" 
                             onclick="chapters.load(${index})">
-                            第${chapter.chapter}章 · ${chapter.title}
+                            ${chapter.chapter === 0 ? chapter.title : '第' + chapter.chapter + '章 · ' + chapter.title}
                         </li>
                     `).join('');
                 },
@@ -3504,9 +3533,10 @@
                         const notesHtml = this.createNotesHtml(chapter.sections.notes, '【注释】');
                         const remarksHtml = this.createNotesHtml(chapter.sections.remarks, '【备注】', true);
                         
+                        const cardClass = chapter.chapter === 0 && chapter.title === '总章' ? 'card poem-card' : 'card';
                         return `
-                            <div class="card">
-                                <div class="title">第${chapter.chapter}章 ${chapter.title}</div>
+                            <div class="${cardClass}">
+                                <div class="title">${chapter.chapter === 0 ? chapter.title : '第' + chapter.chapter + '章 ' + chapter.title}</div>
                                 ${contentHtml}
                                 ${notesHtml}
                                 ${remarksHtml}
