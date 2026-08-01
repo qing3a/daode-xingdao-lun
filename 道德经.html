@@ -292,7 +292,7 @@
         /* 非小屏状态下，对话框的宽度受限于两个侧边栏 */
         @media (min-width: 769px) {
             .card {
-                max-width: calc(100% - 560px); /* 560px为两侧边栏的总宽度估算 */
+                max-width: 860px; /* 侧边栏为悬浮层，卡片取舒适的阅读宽度 */
                 margin-left: auto;
                 margin-right: auto;
                 width: auto; /* 允许自然宽度 */
@@ -491,9 +491,25 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             transform: translateY(-2px);
         }
+
+        /* ===== 阅读增强 ===== */
+        #reading-progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--primary-color);z-index:120;transition:width .12s linear}
+        #cards-container{--fs:1.2rem}
+        #cards-container .section-text{font-size:var(--fs)!important}
+        #cards-container .note-item{font-size:calc(var(--fs) - 0.25rem)!important}
+        .chapter-nav{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;background:var(--weapp-capsule-bg);backdrop-filter:blur(8px);border:1px solid var(--weapp-nav-border);border-radius:24px;padding:6px 8px;z-index:95;box-shadow:0 4px 16px rgba(0,0,0,0.15);white-space:nowrap}
+        .chapter-nav button{background:transparent;border:none;color:var(--primary-color);font-family:'KaiTi','楷体',serif;font-size:0.85rem;padding:6px 12px;border-radius:16px;cursor:pointer;transition:background .2s}
+        .chapter-nav button:hover{background:var(--label-bg-color)}
+        .chapter-nav button:disabled{opacity:0.35;cursor:default}
+        .chapter-nav .nav-count{font-size:0.72rem;color:var(--muted-text);padding:0 6px}
+        @media (max-width: 600px){
+            .chapter-nav{bottom:74px}
+            .chapter-nav button{padding:5px 9px;font-size:0.8rem}
+        }
     </style>
 </head>
 <body>
+    <div id="reading-progress"></div>
     <div class="weapp-header">
         <div class="weapp-nav">
             <div class="title-bar">
@@ -503,10 +519,14 @@
         </div>
     </div>
     
+    <div class="overlay" id="overlay"></div>
+
     <div class="taskbar">
         <div class="nav-row" id="navRow">
-            <button class="back-to-reading-btn" id="backToReadingBtn"><返回</button>
+            <button class="back-to-reading-btn" id="backToReadingBtn">首页</button>
             <button class="main-btn" id="directoryBtn" data-action="directory">目录</button>
+            <button class="main-btn" id="fontMinusBtn" title="缩小字号">A−</button>
+            <button class="main-btn" id="fontPlusBtn" title="放大字号">A+</button>
         </div>
     </div>
 
@@ -592,6 +612,13 @@
                 <button class="modal-btn modal-btn-primary" id="confirm-delete-btn">确认删除</button>
             </div>
         </div>
+    </div>
+
+    <!-- 底部章节导航 -->
+    <div class="chapter-nav" id="chapterNav">
+        <button id="prevBtn" disabled>← 上一章</button>
+        <span class="nav-count" id="navCount">1 / 81</span>
+        <button id="nextBtn" disabled>下一章 →</button>
     </div>
 
     <!-- 内嵌默认书籍数据（file:// 直接打开时兜底使用，无需 JSON 文件）-->
@@ -3036,7 +3063,14 @@
                 confirmImportBtn: document.getElementById('confirm-import-btn'),
                 confirmDeleteBtn: document.getElementById('confirm-delete-btn'),
                 cardsContainer: document.getElementById('cards-container'),
-                mainContent: document.querySelector('.main-content')
+                mainContent: document.querySelector('.main-content'),
+                overlay: document.getElementById('overlay'),
+                progressBar: document.getElementById('reading-progress'),
+                prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'),
+                navCount: document.getElementById('navCount'),
+                fontMinusBtn: document.getElementById('fontMinusBtn'),
+                fontPlusBtn: document.getElementById('fontPlusBtn')
             };
 
             // 工具函数
@@ -3082,6 +3116,74 @@
                 showReadingPage() {
                     els.mainContent.style.display = 'block';
                     els.cardsContainer.style.display = 'block';
+                }
+            };
+
+            // 阅读体验增强：进度条 / 章节定位 / 字号 / 位置记忆
+            const reader = {
+                get total() {
+                    return state.currentBook ? state.currentBook.content.length : 0;
+                },
+                currentIndex() {
+                    const cards = els.cardsContainer.children;
+                    if (!cards.length) return 0;
+                    const probe = window.innerHeight * 0.35;
+                    for (let i = cards.length - 1; i >= 0; i--) {
+                        if (cards[i].getBoundingClientRect().top <= probe) return i;
+                    }
+                    return 0;
+                },
+                updateProgress() {
+                    const doc = document.documentElement;
+                    const total = doc.scrollHeight - doc.clientHeight;
+                    const pct = total > 0 ? (doc.scrollTop / total) * 100 : 0;
+                    els.progressBar.style.width = pct.toFixed(1) + '%';
+                },
+                updateNav() {
+                    if (!state.currentBook) return;
+                    const idx = this.currentIndex();
+                    state.currentChapterIndex = idx;
+                    document.querySelectorAll('.chapter-item').forEach((item, i) => {
+                        item.classList.toggle('current', i === idx);
+                    });
+                    els.navCount.textContent = (idx + 1) + ' / ' + this.total;
+                    els.prevBtn.disabled = idx <= 0;
+                    els.nextBtn.disabled = idx >= this.total - 1;
+                    try {
+                        localStorage.setItem('xingdaolun_pos', JSON.stringify({ chapter: idx }));
+                    } catch (e) {}
+                },
+                goChapter(index) {
+                    const card = els.cardsContainer.children[index];
+                    if (!card) return;
+                    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    this.updateNav();
+                },
+                restorePosition() {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem('xingdaolun_pos') || 'null');
+                        if (saved && typeof saved.chapter === 'number' && this.total) {
+                            const idx = Math.min(Math.max(saved.chapter, 0), this.total - 1);
+                            const card = els.cardsContainer.children[idx];
+                            if (card) window.scrollTo(0, card.offsetTop - 16);
+                        }
+                    } catch (e) {}
+                    this.updateProgress();
+                    this.updateNav();
+                },
+                applyFontSize(size) {
+                    if (typeof size !== 'number' || !isFinite(size)) return;
+                    els.cardsContainer.style.setProperty('--fs', size.toFixed(1) + 'rem');
+                    try { localStorage.setItem('xingdaolun_fs', String(size)); } catch (e) {}
+                },
+                currentFontSize() {
+                    const v = parseFloat(getComputedStyle(els.cardsContainer).getPropertyValue('--fs'));
+                    return isFinite(v) && v > 0 ? v : 1.2;
+                },
+                initFontSize() {
+                    let size = 1.2;
+                    try { size = parseFloat(localStorage.getItem('xingdaolun_fs')) || 1.2; } catch (e) {}
+                    this.applyFontSize(Math.min(1.6, Math.max(0.9, size)));
                 }
             };
 
@@ -3458,9 +3560,36 @@
                 });
                 
                 document.querySelector('.back-to-reading-btn')?.addEventListener('click', () => {
-                    // window.location.href = '智能记录.html';
-                    // 注释掉跳转代码，避免文件不存在导致的错误
+                    window.location.href = './index.html';
                 });
+
+                // 遮罩层点击关闭侧边栏
+                els.overlay?.addEventListener('click', () => utils.toggleSidebar(false));
+
+                // 字号调节（A− / A+）
+                els.fontMinusBtn?.addEventListener('click', () => {
+                    reader.applyFontSize(Math.max(0.9, Math.round((reader.currentFontSize() - 0.1) * 10) / 10));
+                });
+                els.fontPlusBtn?.addEventListener('click', () => {
+                    reader.applyFontSize(Math.min(1.6, Math.round((reader.currentFontSize() + 0.1) * 10) / 10));
+                });
+
+                // 上一章 / 下一章
+                els.prevBtn?.addEventListener('click', () => reader.goChapter(reader.currentIndex() - 1));
+                els.nextBtn?.addEventListener('click', () => reader.goChapter(reader.currentIndex() + 1));
+
+                // 滚动监听：进度条 + 当前章节同步（节流）
+                let scrollTicking = false;
+                window.addEventListener('scroll', () => {
+                    if (!scrollTicking) {
+                        scrollTicking = true;
+                        requestAnimationFrame(() => {
+                            reader.updateProgress();
+                            reader.updateNav();
+                            scrollTicking = false;
+                        });
+                    }
+                }, { passive: true });
                 
                 // 模态框事件
                 document.addEventListener('click', e => {
@@ -3521,6 +3650,10 @@
                 setTimeout(() => {
                     books.loadDefault().then(() => {
                         books.render();
+                        reader.initFontSize();
+                        setTimeout(() => {
+                            reader.restorePosition();
+                        }, 80);
                     }).catch(error => {
                         console.error('初始化书籍失败:', error);
                     });
