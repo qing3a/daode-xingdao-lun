@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+# -*- coding: utf-8 -*-
+"""生成总站首页 index.html（作者作品总站门户）"""
+
+html = '''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -231,3 +234,7 @@
     </footer>
 </body>
 </html>
+'''
+
+open('index.html', 'w', encoding='utf-8').write(html)
+print('index.html（作品总站）生成完成')
