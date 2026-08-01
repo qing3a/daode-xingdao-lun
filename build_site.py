@@ -1,4 +1,16 @@
-<!DOCTYPE html>
+# -*- coding: utf-8 -*-
+"""从 行道论.json 生成官网首页 index.html"""
+import json
+
+book = json.load(open('行道论.json', encoding='utf-8'))
+chapters = book['content']
+
+chips = '\n'.join(
+    f'                <a class="chapter-chip" href="./道德经.html">第{ch["chapter"]}章 · {ch["title"]}</a>'
+    for ch in chapters
+)
+
+html = f'''<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +18,7 @@
     <meta name="description" content="新版-行道论：对《道德经》的逐章再阐释——以生存与发展为基点的系统学说。个人作品，非学术翻译。">
     <title>新版-行道论</title>
     <style>
-        :root {
+        :root {{
             --primary: #8c2f1b;
             --secondary: #5c3c10;
             --border: #d4b483;
@@ -17,9 +29,9 @@
             --muted: #666;
             --divider: rgba(212,180,131,0.35);
             --shadow: rgba(212,180,131,0.25);
-        }
-        @media (prefers-color-scheme: dark) {
-            :root {
+        }}
+        @media (prefers-color-scheme: dark) {{
+            :root {{
                 --primary: #d48c7b;
                 --secondary: #b49c70;
                 --border: #8c6c43;
@@ -30,46 +42,46 @@
                 --muted: #b3b3b3;
                 --divider: rgba(140,108,67,0.35);
                 --shadow: rgba(0,0,0,0.4);
-            }
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-        body {
+            }}
+        }}
+        * {{ margin:0; padding:0; box-sizing:border-box; }}
+        html {{ scroll-behavior:smooth; }}
+        body {{
             font-family: "楷体","STKaiti","KaiTi",serif;
             background: var(--bg);
             color: var(--text);
             line-height: 1.8;
             -webkit-font-smoothing: antialiased;
-        }
-        a { color: inherit; text-decoration: none; }
+        }}
+        a {{ color: inherit; text-decoration: none; }}
 
-        .nav {
+        .nav {{
             position: sticky; top:0; z-index:100;
             background: color-mix(in srgb, var(--bg) 88%, transparent);
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--divider);
-        }
-        .nav-inner {
+        }}
+        .nav-inner {{
             max-width: 980px; margin: 0 auto; padding: 12px 24px;
             display: flex; align-items: center; gap: 18px;
-        }
-        .nav-brand { font-weight: bold; color: var(--primary); letter-spacing: 1px; white-space: nowrap; }
-        .nav-links { display: flex; gap: 16px; margin-left: auto; }
-        .nav-links a { font-size: 0.92rem; color: var(--muted); }
-        .nav-links a:hover { color: var(--primary); }
-        .nav-read {
+        }}
+        .nav-brand {{ font-weight: bold; color: var(--primary); letter-spacing: 1px; white-space: nowrap; }}
+        .nav-links {{ display: flex; gap: 16px; margin-left: auto; }}
+        .nav-links a {{ font-size: 0.92rem; color: var(--muted); }}
+        .nav-links a:hover {{ color: var(--primary); }}
+        .nav-read {{
             padding: 6px 14px; border-radius: 4px;
             background: var(--primary); color: #fff;
             font-size: 0.9rem; white-space: nowrap;
-        }
-        .nav-read:hover { filter: brightness(1.1); }
+        }}
+        .nav-read:hover {{ filter: brightness(1.1); }}
 
-        .hero {
+        .hero {{
             text-align: center;
             padding: 72px 24px 48px;
             max-width: 820px; margin: 0 auto;
-        }
-        .eyebrow {
+        }}
+        .eyebrow {{
             display: inline-block;
             font-size: 0.85rem; letter-spacing: 4px;
             color: var(--secondary);
@@ -77,103 +89,103 @@
             border-radius: 20px;
             padding: 4px 18px;
             background: var(--card);
-        }
-        .hero h1 {
+        }}
+        .hero h1 {{
             font-size: 3.2rem; margin: 24px 0 12px;
             color: var(--primary); letter-spacing: 6px;
-        }
-        .hero .subtitle { font-size: 1.05rem; color: var(--muted); }
-        .hero .divider {
+        }}
+        .hero .subtitle {{ font-size: 1.05rem; color: var(--muted); }}
+        .hero .divider {{
             width: 72px; height: 2px; margin: 24px auto;
             background: linear-gradient(90deg, transparent, var(--border), transparent);
-        }
-        .hero-quote {
+        }}
+        .hero-quote {{
             font-size: 1.02rem; color: var(--secondary);
             line-height: 2.2; margin-bottom: 34px;
-        }
-        .cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .btn {
+        }}
+        .cta {{ display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }}
+        .btn {{
             padding: 12px 32px; border-radius: 6px; font-size: 1.05rem;
             font-family: inherit; letter-spacing: 2px;
             transition: transform .2s, box-shadow .2s;
-        }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px var(--shadow); }
-        .btn-ghost { border: 1px solid var(--border); color: var(--secondary); background: var(--card); }
-        .btn:hover { transform: translateY(-2px); }
+        }}
+        .btn-primary {{ background: var(--primary); color: #fff; box-shadow: 0 4px 14px var(--shadow); }}
+        .btn-ghost {{ border: 1px solid var(--border); color: var(--secondary); background: var(--card); }}
+        .btn:hover {{ transform: translateY(-2px); }}
 
-        section { max-width: 980px; margin: 0 auto; padding: 56px 24px; }
-        .sec-head { text-align: center; margin-bottom: 36px; }
-        .sec-index {
+        section {{ max-width: 980px; margin: 0 auto; padding: 56px 24px; }}
+        .sec-head {{ text-align: center; margin-bottom: 36px; }}
+        .sec-index {{
             display: inline-block; font-size: 0.8rem; letter-spacing: 3px;
             color: var(--primary); margin-bottom: 8px;
-        }
-        .sec-head h2 { font-size: 1.7rem; color: var(--primary); letter-spacing: 4px; }
-        .sec-head p { color: var(--muted); font-size: 0.95rem; margin-top: 8px; }
+        }}
+        .sec-head h2 {{ font-size: 1.7rem; color: var(--primary); letter-spacing: 4px; }}
+        .sec-head p {{ color: var(--muted); font-size: 0.95rem; margin-top: 8px; }}
 
-        .about-text { max-width: 760px; margin: 0 auto; font-size: 1.02rem; }
-        .about-text p + p { margin-top: 14px; }
-        .feat-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-top: 30px; }
-        .feat {
+        .about-text {{ max-width: 760px; margin: 0 auto; font-size: 1.02rem; }}
+        .about-text p + p {{ margin-top: 14px; }}
+        .feat-list {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-top: 30px; }}
+        .feat {{
             background: var(--card); border: 1px solid var(--border);
             border-radius: 10px; padding: 20px; text-align: center;
-        }
-        .feat .num { font-size: 1.3rem; color: var(--primary); font-weight: bold; }
-        .feat .name { margin: 8px 0 6px; color: var(--secondary); font-weight: bold; }
-        .feat .desc { font-size: 0.9rem; color: var(--muted); }
+        }}
+        .feat .num {{ font-size: 1.3rem; color: var(--primary); font-weight: bold; }}
+        .feat .name {{ margin: 8px 0 6px; color: var(--secondary); font-weight: bold; }}
+        .feat .desc {{ font-size: 0.9rem; color: var(--muted); }}
 
-        .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 18px; }
-        .concept {
+        .concept-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 18px; }}
+        .concept {{
             background: var(--card); border: 1px solid var(--border);
             border-radius: 12px; padding: 24px;
             transition: transform .25s, box-shadow .25s;
-        }
-        .concept:hover { transform: translateY(-3px); box-shadow: 0 8px 20px var(--shadow); }
-        .concept h3 { color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; }
-        .concept p { font-size: 0.95rem; color: var(--muted); }
+        }}
+        .concept:hover {{ transform: translateY(-3px); box-shadow: 0 8px 20px var(--shadow); }}
+        .concept h3 {{ color: var(--primary); font-size: 1.15rem; margin-bottom: 10px; }}
+        .concept p {{ font-size: 0.95rem; color: var(--muted); }}
 
-        .quad-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; }
-        .quad {
+        .quad-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; }}
+        .quad {{
             border-radius: 12px; padding: 24px; text-align: center;
             background: var(--card); border: 1px solid var(--border);
-        }
-        .quad .tag {
+        }}
+        .quad .tag {{
             display: inline-block; font-size: 0.85rem; letter-spacing: 2px;
             padding: 3px 14px; border-radius: 14px; color: #fff; margin-bottom: 12px;
-        }
-        .quad .name { font-weight: bold; font-size: 1.1rem; color: var(--secondary); }
-        .quad .desc { font-size: 0.92rem; color: var(--muted); margin-top: 6px; }
-        .t-phenomenon { background: #4a8f29; }
-        .t-modeling { background: #2b6b9a; }
-        .t-strategy { background: #6b2b9a; }
-        .t-comment { background: #9a2b6b; }
-        .method-note {
+        }}
+        .quad .name {{ font-weight: bold; font-size: 1.1rem; color: var(--secondary); }}
+        .quad .desc {{ font-size: 0.92rem; color: var(--muted); margin-top: 6px; }}
+        .t-phenomenon {{ background: #4a8f29; }}
+        .t-modeling {{ background: #2b6b9a; }}
+        .t-strategy {{ background: #6b2b9a; }}
+        .t-comment {{ background: #9a2b6b; }}
+        .method-note {{
             margin-top: 22px; padding: 16px 20px;
             background: var(--highlight); border-left: 4px solid var(--primary);
             border-radius: 6px; font-size: 0.95rem; color: var(--muted);
-        }
+        }}
 
-        .chip-wrap { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .chapter-chip {
+        .chip-wrap {{ display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }}
+        .chapter-chip {{
             padding: 6px 14px; border-radius: 18px;
             border: 1px solid var(--border); background: var(--card);
             font-size: 0.88rem; color: var(--secondary);
             transition: all .2s;
-        }
-        .chapter-chip:hover {
+        }}
+        .chapter-chip:hover {{
             border-color: var(--primary); color: var(--primary);
             transform: translateY(-1px);
-        }
+        }}
 
-        footer {
+        footer {{
             border-top: 1px solid var(--divider);
             padding: 36px 24px 48px; text-align: center;
             color: var(--muted); font-size: 0.88rem;
-        }
-        footer .flink { color: var(--primary); }
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 2.2rem; }
-            .nav-links { display: none; }
-        }
+        }}
+        footer .flink {{ color: var(--primary); }}
+        @media (max-width: 600px) {{
+            .hero h1 {{ font-size: 2.2rem; }}
+            .nav-links {{ display: none; }}
+        }}
     </style>
 </head>
 <body>
@@ -298,87 +310,7 @@
                 <p>从「道之门」到「道积」——点击任意一章，进入在线阅读器</p>
             </div>
             <div class="chip-wrap">
-                <a class="chapter-chip" href="./道德经.html">第一章 · 道之门</a>
-                <a class="chapter-chip" href="./道德经.html">第二章 · 道相</a>
-                <a class="chapter-chip" href="./道德经.html">第三章 · 道制</a>
-                <a class="chapter-chip" href="./道德经.html">第四章 · 道冲</a>
-                <a class="chapter-chip" href="./道德经.html">第五章 · 道私</a>
-                <a class="chapter-chip" href="./道德经.html">第六章 · 道古</a>
-                <a class="chapter-chip" href="./道德经.html">第七章 · 道神</a>
-                <a class="chapter-chip" href="./道德经.html">第八章 · 道无</a>
-                <a class="chapter-chip" href="./道德经.html">第九章 · 道有</a>
-                <a class="chapter-chip" href="./道德经.html">第十章 · 道能</a>
-                <a class="chapter-chip" href="./道德经.html">第十一章 · 道器1</a>
-                <a class="chapter-chip" href="./道德经.html">第十二章 · 道欲</a>
-                <a class="chapter-chip" href="./道德经.html">第十三章 · 道身</a>
-                <a class="chapter-chip" href="./道德经.html">第十四章 · 道始</a>
-                <a class="chapter-chip" href="./道德经.html">第十五章 · 道现</a>
-                <a class="chapter-chip" href="./道德经.html">第十六章 · 道观</a>
-                <a class="chapter-chip" href="./道德经.html">第十七章 · 道信</a>
-                <a class="chapter-chip" href="./道德经.html">第十八章 · 道中</a>
-                <a class="chapter-chip" href="./道德经.html">第十九章 · 道等</a>
-                <a class="chapter-chip" href="./道德经.html">第二十章 · 道母</a>
-                <a class="chapter-chip" href="./道德经.html">第二十一章 · 道父</a>
-                <a class="chapter-chip" href="./道德经.html">第二十二章 · 道圆</a>
-                <a class="chapter-chip" href="./道德经.html">第二十三章 · 道同</a>
-                <a class="chapter-chip" href="./道德经.html">第二十四章 · 道余</a>
-                <a class="chapter-chip" href="./道德经.html">第二十五章 · 道象</a>
-                <a class="chapter-chip" href="./道德经.html">第二十六章 · 道申</a>
-                <a class="chapter-chip" href="./道德经.html">第二十七章 · 道善</a>
-                <a class="chapter-chip" href="./道德经.html">第二十八章 · 道逆</a>
-                <a class="chapter-chip" href="./道德经.html">第二十九章 · 道静</a>
-                <a class="chapter-chip" href="./道德经.html">第三十章 · 道佐</a>
-                <a class="chapter-chip" href="./道德经.html">第三十一章 · 道佑</a>
-                <a class="chapter-chip" href="./道德经.html">第三十二章 · 道名</a>
-                <a class="chapter-chip" href="./道德经.html">第三十三章 · 长生久事</a>
-                <a class="chapter-chip" href="./道德经.html">第三十四章 · 道大</a>
-                <a class="chapter-chip" href="./道德经.html">第三十五章 · 道仁</a>
-                <a class="chapter-chip" href="./道德经.html">第三十六章 · 道小</a>
-                <a class="chapter-chip" href="./道德经.html">第三十七章 · 道镇</a>
-                <a class="chapter-chip" href="./道德经.html">第三十八章 · 道厚</a>
-                <a class="chapter-chip" href="./道德经.html">第三十九章 · 道本</a>
-                <a class="chapter-chip" href="./道德经.html">第四十章 · 道去</a>
-                <a class="chapter-chip" href="./道德经.html">第四十一章 · 道异</a>
-                <a class="chapter-chip" href="./道德经.html">第四十二章 · 道华</a>
-                <a class="chapter-chip" href="./道德经.html">第四十三章 · 道盛</a>
-                <a class="chapter-chip" href="./道德经.html">第四十四章 · 道止</a>
-                <a class="chapter-chip" href="./道德经.html">第四十五章 · 道共</a>
-                <a class="chapter-chip" href="./道德经.html">第四十六章 · 道并1</a>
-                <a class="chapter-chip" href="./道德经.html">第四十七章 · 道鉴</a>
-                <a class="chapter-chip" href="./道德经.html">第四十八章 · 道损1</a>
-                <a class="chapter-chip" href="./道德经.html">第四十九章 · 道任1</a>
-                <a class="chapter-chip" href="./道德经.html">第五十章 · 失地</a>
-                <a class="chapter-chip" href="./道德经.html">第五十一章 · 道得</a>
-                <a class="chapter-chip" href="./道德经.html">第五十二章 · 道常</a>
-                <a class="chapter-chip" href="./道德经.html">第五十三章 · 道夸</a>
-                <a class="chapter-chip" href="./道德经.html">第五十四章 · 道修</a>
-                <a class="chapter-chip" href="./道德经.html">第五十五章 · 道务</a>
-                <a class="chapter-chip" href="./道德经.html">第五十六章 · 道贵</a>
-                <a class="chapter-chip" href="./道德经.html">第五十七章 · 道风</a>
-                <a class="chapter-chip" href="./道德经.html">第五十八章 · 道顺</a>
-                <a class="chapter-chip" href="./道德经.html">第五十九章 · 道啬</a>
-                <a class="chapter-chip" href="./道德经.html">第六十章 · 道居</a>
-                <a class="chapter-chip" href="./道德经.html">第六十一章 · 道容</a>
-                <a class="chapter-chip" href="./道德经.html">第六十二章 · 道为</a>
-                <a class="chapter-chip" href="./道德经.html">第六十三章 · 道恩</a>
-                <a class="chapter-chip" href="./道德经.html">第六十四章 · 道渊</a>
-                <a class="chapter-chip" href="./道德经.html">第六十五章 · 道存</a>
-                <a class="chapter-chip" href="./道德经.html">第六十六章 · 道王</a>
-                <a class="chapter-chip" href="./道德经.html">第六十七章 · 道宝</a>
-                <a class="chapter-chip" href="./道德经.html">第六十八章 · 道配</a>
-                <a class="chapter-chip" href="./道德经.html">第六十九章 · 道并2</a>
-                <a class="chapter-chip" href="./道德经.html">第七十章 · 道知</a>
-                <a class="chapter-chip" href="./道德经.html">第七十一章 · 道病</a>
-                <a class="chapter-chip" href="./道德经.html">第七十二章 · 道威</a>
-                <a class="chapter-chip" href="./道德经.html">第七十三章 · 道任2</a>
-                <a class="chapter-chip" href="./道德经.html">第七十四章 · 道备</a>
-                <a class="chapter-chip" href="./道德经.html">第七十五章 · 道损2</a>
-                <a class="chapter-chip" href="./道德经.html">第七十六章 · 道合</a>
-                <a class="chapter-chip" href="./道德经.html">第七十七章 · 道均</a>
-                <a class="chapter-chip" href="./道德经.html">第七十八章 · 道易</a>
-                <a class="chapter-chip" href="./道德经.html">第七十九章 · 道与</a>
-                <a class="chapter-chip" href="./道德经.html">第八十章 · 道普</a>
-                <a class="chapter-chip" href="./道德经.html">第八十一章 · 道积</a>
+{chips}
             </div>
         </section>
     </main>
@@ -393,3 +325,7 @@
     </footer>
 </body>
 </html>
+'''
+
+open('index.html', 'w', encoding='utf-8').write(html)
+print(f"index.html 生成完成，共 {len(chapters)} 个章节入口")
