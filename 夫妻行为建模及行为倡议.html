@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>夫妻行为建模 · 行为倡议</title>
+    <style>
+        /* ============================================================
+           简洁现代 · 卡片式布局 · 深色/浅色主题
+           「情绪博弈 · 最终模型」的镜像篇：从公理到契约
+           ============================================================ */
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #2d3a52;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --gold: #facc15;
+            --blue: #60a5fa;
+            --red: #f87171;
+            --purple: #a78bfa;
+            --green: #34d399;
+            --radius: 16px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --transition: 0.3s ease;
+        }
+
+        body.light {
+            --bg: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f0f4ff;
+            --border: #d1d9e8;
+            --text: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.4s, color 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== 主容器 ===== */
+        .presentation {
+            width: 1280px;
+            max-width: 98vw;
+            height: 900px;
+            max-height: 98vh;
+            background: var(--bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.4s;
+            position: relative;
+        }
+
+        /* ===== 幻灯片 ===== */
+        .slides-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            padding: 36px 48px 24px 48px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(18px) scale(0.98);
+            transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .slide::-webkit-scrollbar { width: 4px; }
+        .slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            z-index: 10;
+        }
+
+        /* ===== 标题区 ===== */
+        .slide-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 2px;
+            flex-shrink: 0;
+        }
+        .slide-header .num {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            background: var(--bg-card);
+            padding: 2px 14px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+        .slide-header h2 {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
+        .slide-header .badge {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            padding: 2px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            margin-left: auto;
+        }
+        .slide-sub {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            padding-left: 4px;
+            flex-shrink: 0;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 0;
+        }
+
+        /* ===== 卡片网格 ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            flex: 1;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 18px;
+            flex: 1;
+        }
+        .grid-2-1 {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 18px;
+            flex: 1;
+        }
+        .grid-1-2 {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 18px;
+            flex: 1;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s;
+        }
+        .card:hover {
+            border-color: var(--blue);
+            background: var(--bg-card-hover);
+        }
+
+        .card .label {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 2px;
+        }
+        .card .title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .card .desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .card .tag {
+            font-size: 13px;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 2px 14px;
+            border-radius: 40px;
+            display: inline-block;
+            align-self: flex-start;
+            margin-top: 6px;
+        }
+
+        .card-gold .title { color: var(--gold); }
+        .card-blue .title { color: var(--blue); }
+        .card-red .title { color: var(--red); }
+        .card-purple .title { color: var(--purple); }
+        .card-green .title { color: var(--green); }
+
+        /* ===== 特殊：公理卡 ===== */
+        .axiom-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 2px solid var(--gold);
+            padding: 24px 32px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .axiom-card .big {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: -0.5px;
+        }
+        .axiom-card .sub {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .axiom-card .foot {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        /* ===== 健康行为步骤（绿色版否定层级） ===== */
+        .health-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 6px;
+        }
+        .health-steps .step {
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 4px 14px;
+            border-radius: 40px;
+            border-left: 3px solid var(--green);
+        }
+        .health-steps .step strong {
+            color: var(--green);
+        }
+
+        /* ===== 流程图 ===== */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 14px;
+            flex-wrap: wrap;
+        }
+        .flow-node {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .flow-node.highlight {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        .flow-node.red {
+            border-color: var(--red);
+            color: var(--red);
+        }
+        .flow-node.green {
+            border-color: var(--green);
+            color: var(--green);
+        }
+        .flow-arrow {
+            font-size: 22px;
+            color: var(--text-muted);
+        }
+        .flow-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== 行为倡议 · 十条契约 ===== */
+        .covenant-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+        }
+        .covenant-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s;
+        }
+        .covenant-item:hover {
+            border-color: var(--green);
+            background: var(--bg-card-hover);
+        }
+        .covenant-item .no {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--green);
+            opacity: 0.9;
+            min-width: 30px;
+            text-align: center;
+        }
+        .covenant-item .ct {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .covenant-item .cd {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===== 需求翻译表 ===== */
+        .translate-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        .translate-row .t-from {
+            background: var(--bg);
+            border: 1px solid var(--red);
+            color: var(--red);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .translate-row .t-arrow { color: var(--text-muted); font-size: 18px; }
+        .translate-row .t-to {
+            background: var(--bg);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        /* ===== 封面 ===== */
+        .slide-cover {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 60px;
+        }
+        .slide-cover .main {
+            font-size: 52px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--text) 0%, var(--green) 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .slide-cover .sub {
+            font-size: 22px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            letter-spacing: 2px;
+        }
+        .slide-cover .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--gold);
+            margin: 16px auto 20px auto;
+            border-radius: 4px;
+        }
+        .slide-cover .tags {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .slide-cover .tags span {
+            background: var(--bg-card);
+            padding: 4px 18px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+        .slide-cover .hint {
+            margin-top: 32px;
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        /* ===== 导航栏 ===== */
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 36px 16px 36px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--bg);
+            transition: background 0.4s;
+        }
+        .nav-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff;
+        }
+        .nav-btn:active { transform: scale(0.92); }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .dots {
+            display: flex;
+            gap: 10px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 40px;
+            background: var(--border);
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, width 0.3s;
+            padding: 0;
+        }
+        .dot.active {
+            background: var(--blue);
+            width: 28px;
+        }
+        .dot:hover { background: var(--text-secondary); }
+        .dot.active:hover { background: var(--blue); }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .page-num {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+            min-width: 56px;
+            text-align: center;
+        }
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .theme-toggle:hover {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 1024px) {
+            .slide { padding: 24px 28px 16px 28px; }
+            .grid-2, .grid-3, .grid-2-1, .grid-1-2 { grid-template-columns: 1fr; }
+            .covenant-grid { grid-template-columns: 1fr; }
+            .slide-header h2 { font-size: 22px; }
+            .slide-cover .main { font-size: 38px; }
+            .nav-bar { padding: 8px 16px 12px 16px; }
+            .axiom-card .big { font-size: 28px; }
+            .flow-row { gap: 6px 10px; }
+            .flow-node { font-size: 12px; padding: 6px 12px; }
+        }
+        @media (max-width: 600px) {
+            .presentation { border-radius: 0; max-width: 100vw; max-height: 100vh; height: 100vh; width: 100vw; }
+            .slide { padding: 14px 14px 10px 14px; }
+            .slide-header h2 { font-size: 18px; }
+            .slide-header .badge { display: none; }
+            .slide-sub { font-size: 13px; margin-bottom: 12px; }
+            .card { padding: 14px 16px; }
+            .card .title { font-size: 17px; }
+            .card .desc { font-size: 13px; }
+            .axiom-card .big { font-size: 22px; }
+            .slide-cover .main { font-size: 28px; }
+            .slide-cover .sub { font-size: 16px; }
+            .nav-btn, .theme-toggle { width: 34px; height: 34px; font-size: 14px; }
+            .dot { width: 8px; height: 8px; }
+            .dot.active { width: 16px; }
+            .page-num { font-size: 12px; min-width: 40px; }
+            .health-steps .step { font-size: 11px; padding: 2px 10px; }
+            .flow-node { font-size: 11px; padding: 4px 8px; }
+            .flow-arrow { font-size: 16px; }
+            .covenant-item { padding: 10px 12px; }
+            .covenant-item .ct { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+
+        <!-- ===== 幻灯片容器 ===== -->
+        <div class="slides-wrapper">
+
+            <!-- ===== SLIDE 0: 封面 ===== -->
+            <div class="slide slide-cover active" data-index="0">
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <div class="main">夫妻行为建模 · 行为倡议</div>
+                    <div class="sub">从公理到契约 · 一图看懂</div>
+                    <div class="divider"></div>
+                    <div class="tags">
+                        <span>⚖️ 权责对等</span>
+                        <span>💬 沟通回路</span>
+                        <span>🔄 冲突协议</span>
+                        <span>📜 十条倡议</span>
+                    </div>
+                    <div class="hint">← → 方向键 / 滚轮切换 · 主题切换 🌗</div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 1: 公理 + 双场 ===== -->
+            <div class="slide" data-index="1">
+                <div class="slide-header">
+                    <span class="num">01</span>
+                    <h2>建模基础 · 公理与双场</h2>
+                    <span class="badge">核心</span>
+                </div>
+                <div class="slide-sub">唯一公理：「谁决策，谁担责」—— 健康关系的全部行为都从这条公理长出来</div>
+                <div class="slide-content">
+                    <div class="grid-2" style="flex:1;">
+                        <div class="axiom-card">
+                            <div class="big">⚖️ 谁决策，谁担责</div>
+                            <div class="sub">权力与义务必须对等<br>关系成立的基础契约</div>
+                            <div class="foot">公理被遵守 → 安全感；被撕裂 → 博弈启动</div>
+                        </div>
+                        <div style="display:grid;grid-template-rows:1fr 1fr;gap:16px;">
+                            <div class="card card-gold">
+                                <div class="label">场域一</div>
+                                <div class="title">💰 物质场</div>
+                                <div class="desc">安全 · 资源 · 发展 · 财务透明</div>
+                                <span class="tag">健康目标 → 共同经营、各担其责</span>
+                            </div>
+                            <div class="card card-purple">
+                                <div class="label">场域二</div>
+                                <div class="title">❤️ 情感场</div>
+                                <div class="desc">被看见 · 被尊重 · 归属感 · 不被抛弃</div>
+                                <span class="tag">健康目标 → 需求表达、彼此滋养</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 2: 行为模型 · 决策分级 ===== -->
+            <div class="slide" data-index="2">
+                <div class="slide-header">
+                    <span class="num">02</span>
+                    <h2>行为模型 · 决策分级</h2>
+                    <span class="badge">权责</span>
+                </div>
+                <div class="slide-sub">不争谁说了算，只问这件事归谁：决策三问——谁拍板？谁执行？谁兜底？</div>
+                <div class="slide-content">
+                    <div class="grid-3">
+                        <div class="card card-gold">
+                            <div class="label">决策类型</div>
+                            <div class="title">🤝 共同决策</div>
+                            <div class="desc">家庭大事 · 重大支出 · 子女教育<br>双方协商，权责共担，结果同认</div>
+                            <span class="tag">分歧时：定规则，不定输赢</span>
+                        </div>
+                        <div class="card card-blue">
+                            <div class="label">决策类型</div>
+                            <div class="title">🧭 分工决策</div>
+                            <div class="desc">各自主场 · 谁擅长谁拍板<br>决策者担责，另一方不事后追责</div>
+                            <span class="tag">信任的表现：尊重对方的主场</span>
+                        </div>
+                        <div class="card card-green">
+                            <div class="label">决策类型</div>
+                            <div class="title">✋ 自主决策</div>
+                            <div class="desc">个人事务 · 私人边界<br>边界清晰，互不越界、互不审判</div>
+                            <span class="tag">独立与亲密并存，才不窒息</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:4px;text-align:center;font-size:14px;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:12px;">
+                        安全感公式：<strong style="color:var(--gold);">安全感 = 权责对等</strong> + <strong style="color:var(--green);">边界清晰</strong> + <strong style="color:var(--blue);">可预期</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 3: 行为模型 · 沟通回路 ===== -->
+            <div class="slide" data-index="3">
+                <div class="slide-header">
+                    <span class="num">03</span>
+                    <h2>行为模型 · 沟通回路</h2>
+                    <span class="badge">表达</span>
+                </div>
+                <div class="slide-sub">沟通不是说话，是「表达 → 被听懂 → 被回应」的完整回路</div>
+                <div class="slide-content">
+                    <div class="grid-2-1">
+                        <div class="card">
+                            <div class="label" style="color:var(--green);">沟通回路 · 闭环五步</div>
+                            <div class="flow-row" style="margin-top:14px;">
+                                <div class="flow-node green">🗣️ 表达<br>「我」信息</div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-node">👂 倾听<br>不打断</div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-node">🔄 复述<br>确认听懂</div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-node">💡 回应<br>满足需求</div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-node green">✅ 闭环<br>确认到达</div>
+                            </div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:14px;">→ 表达用「我需要…」，不用「你总是…」；倾听先听懂，再回应</div>
+                            <div class="health-steps">
+                                <span class="step"><strong>戒一</strong> 不评判</span>
+                                <span class="step"><strong>戒二</strong> 不否定感受</span>
+                                <span class="step"><strong>戒三</strong> 不翻旧账</span>
+                                <span class="step"><strong>戒四</strong> 不贴标签</span>
+                            </div>
+                        </div>
+                        <div class="card card-purple">
+                            <div class="label">需求翻译</div>
+                            <div class="title" style="font-size:17px;">指责背后，是需求</div>
+                            <div class="translate-row">
+                                <span class="t-from">你总不回家</span>
+                                <span class="t-arrow">→</span>
+                                <span class="t-to">我需要你的陪伴</span>
+                            </div>
+                            <div class="translate-row">
+                                <span class="t-from">你从不夸我</span>
+                                <span class="t-arrow">→</span>
+                                <span class="t-to">我需要被看见</span>
+                            </div>
+                            <div class="translate-row">
+                                <span class="t-from">你什么都管</span>
+                                <span class="t-arrow">→</span>
+                                <span class="t-to">我需要自己的空间</span>
+                            </div>
+                            <span class="tag">先译需求，再谈对错</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 4: 行为模型 · 冲突协议 ===== -->
+            <div class="slide" data-index="4">
+                <div class="slide-header">
+                    <span class="num">04</span>
+                    <h2>行为模型 · 冲突协议</h2>
+                    <span class="badge">修复</span>
+                </div>
+                <div class="slide-sub">冲突是信号，不是故障：它告诉你「有需求没被满足」，处理流程要约定好</div>
+                <div class="slide-content">
+                    <div class="grid-2-1">
+                        <div class="card">
+                            <div class="label" style="color:var(--gold);">冲突处理 · 五步协议</div>
+                            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                                <div class="flow-row" style="justify-content:flex-start;">
+                                    <span style="min-width:24px;font-weight:800;color:var(--gold);">①</span>
+                                    <div class="flow-node">⏸️ 暂停<br>情绪过载，约定暗号</div>
+                                    <div class="flow-node" style="font-size:12px;padding:6px 12px;">冷静 ≥ 20 分钟，不冷战</div>
+                                </div>
+                                <div class="flow-row" style="justify-content:flex-start;">
+                                    <span style="min-width:24px;font-weight:800;color:var(--gold);">②</span>
+                                    <div class="flow-node">🗣️ 轮流表达<br>一人说，一人听</div>
+                                    <div class="flow-node" style="font-size:12px;padding:6px 12px;">不插话，先复述再回应</div>
+                                </div>
+                                <div class="flow-row" style="justify-content:flex-start;">
+                                    <span style="min-width:24px;font-weight:800;color:var(--gold);">③</span>
+                                    <div class="flow-node">🔍 需求翻译<br>找到背后的需要</div>
+                                    <div class="flow-node" style="font-size:12px;padding:6px 12px;">吵的是事，缺的是需求</div>
+                                </div>
+                                <div class="flow-row" style="justify-content:flex-start;">
+                                    <span style="min-width:24px;font-weight:800;color:var(--gold);">④</span>
+                                    <div class="flow-node">🤝 共同方案<br>双赢优先</div>
+                                    <div class="flow-node" style="font-size:12px;padding:6px 12px;">没有赢家，只有方案</div>
+                                </div>
+                                <div class="flow-row" style="justify-content:flex-start;">
+                                    <span style="min-width:24px;font-weight:800;color:var(--gold);">⑤</span>
+                                    <div class="flow-node">📅 复盘<br>下次怎么更好</div>
+                                    <div class="flow-node" style="font-size:12px;padding:6px 12px;">冲突要变成升级的台阶</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card card-red" style="text-align:center;justify-content:center;">
+                            <div style="font-size:52px;">🚨</div>
+                            <div class="title" style="font-size:22px;">红线行为</div>
+                            <div class="desc">一碰红线，博弈即刻重启</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px;">
+                                <span class="health-steps" style="display:contents;"></span>
+                            </div>
+                            <div class="health-steps" style="justify-content:center;margin-top:4px;">
+                                <span class="step" style="border-left-color:var(--red);"><strong>1</strong> 否定人格 · 动机 · 记忆</span>
+                            </div>
+                            <div class="health-steps" style="justify-content:center;">
+                                <span class="step" style="border-left-color:var(--red);"><strong>2</strong> 冷暴力 · 切断沟通</span>
+                            </div>
+                            <div class="health-steps" style="justify-content:center;">
+                                <span class="step" style="border-left-color:var(--red);"><strong>3</strong> 威胁分手 · 以离开要挟</span>
+                            </div>
+                            <span class="tag" style="align-self:center;">红线 = 否定对方为「人」</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 5: 负面具体方法 · 识别手册 ===== -->
+            <div class="slide" data-index="5">
+                <div class="slide-header">
+                    <span class="num">05</span>
+                    <h2>负面具体方法 · 识别手册</h2>
+                    <span class="badge">手段</span>
+                </div>
+                <div class="slide-sub">对照打勾：出现 ≥3 条，或任意 1 条反复出现 → 公理已被系统性撕裂，博弈启动</div>
+                <div class="slide-content">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="label" style="color:var(--red);">A组 · 认知攻击</div>
+                            <div class="title">🧠 摧毁你的判断力</div>
+                            <div class="desc">煤气灯「你记错了」 · 认知扭曲「你想多了」 · 病态撒谎倒打一耙 · 精神谋杀让你背锅</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">→ 让你怀疑记忆与感受，最后是你道歉</div>
+                        </div>
+                        <div class="card">
+                            <div class="label" style="color:var(--red);">B组 · 价值打压</div>
+                            <div class="title">📉 摧毁你的自我价值</div>
+                            <div class="desc">三角测量拿你比较 · 投射性防卫贬低你 · 免责式攻击「开玩笑」 · 自恋供给功劳全占</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">→ 你的存在感被压缩到只剩「讨好」</div>
+                        </div>
+                        <div class="card">
+                            <div class="label" style="color:var(--red);">C组 · 情感操控</div>
+                            <div class="title">🎢 摧毁你的安全感</div>
+                            <div class="desc">断崖冷暴力拉黑消失 · 回吸收割忽冷忽热 · 能量榨取甩锅 · 病态防御一提就暴怒</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">→ 你在天堂与地狱间反复横跳，患得患失</div>
+                        </div>
+                        <div class="card">
+                            <div class="label" style="color:var(--red);">D组 · 承诺操控</div>
+                            <div class="title">🍪 吊住期待，阻止离开</div>
+                            <div class="desc">画饼「到时候再说」 · 服从性测试「你连这点小事都不愿意」 · 隐性吸血鬼从不兑现 · 恶性自恋毫无愧疚</div>
+                            <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">→ 你为了「可能的未来」一再让步</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 6: 应对措施 · 反制手册 ===== -->
+            <div class="slide" data-index="6">
+                <div class="slide-header">
+                    <span class="num">06</span>
+                    <h2>应对措施 · 反制手册</h2>
+                    <span class="badge">防御</span>
+                </div>
+                <div class="slide-sub">先定性，再应对：普通矛盾走沟通回路；病态操控走反制手册，两条路线不可混用</div>
+                <div class="slide-content">
+                    <div class="grid-2">
+                        <div class="card card-blue">
+                            <div class="label">A组 · 断供隔离</div>
+                            <div class="title">🔌 切断能量供给</div>
+                            <div class="desc"><strong>灰岩法则：</strong>不暴露、不交流、保持距离</div>
+                            <div class="desc"><strong>情绪冷冻：</strong>面无表情，你越没反应他越崩溃</div>
+                            <div class="desc"><strong>物理隔绝：</strong>静音拉黑搬家；已读不回是绝杀</div>
+                            <div class="desc"><strong>能量金钟罩：</strong>断不了的，立好边界只谈事务</div>
+                        </div>
+                        <div class="card card-green">
+                            <div class="label">B组 · 话术防御</div>
+                            <div class="title">🛡️ 应对当面攻击</div>
+                            <div class="desc"><strong>停止解释：</strong>一句「你说的都对」挡回去，不投喂情绪</div>
+                            <div class="desc"><strong>指控反弹：</strong>复读三连「这是你的观点，我不认同，谈话结束」</div>
+                            <div class="desc"><strong>信息防火墙：</strong>「我现在不想听这些废话」</div>
+                            <div class="desc"><strong>打太极三不：</strong>不解释、不证明、不贪恋</div>
+                        </div>
+                        <div class="card card-purple">
+                            <div class="label">C组 · 认知重建</div>
+                            <div class="title">🪞 保护你的判断力</div>
+                            <div class="desc"><strong>认知防弹衣：</strong>所有贬低都是他的恐惧投射</div>
+                            <div class="desc"><strong>心理防空洞：</strong>「这是他的课题」「我有权不回应」</div>
+                            <div class="desc"><strong>30天记录：</strong>每天记一件被否定但你做得很棒的事</div>
+                            <div class="desc"><strong>切断外界影响：</strong>重建自己的价值标准</div>
+                        </div>
+                        <div class="card card-gold">
+                            <div class="label">D组 · 局面反制</div>
+                            <div class="title">⚔️ 拿回主动权</div>
+                            <div class="desc"><strong>破模式：</strong>改变反应规律，打破他预期的剧本</div>
+                            <div class="desc"><strong>反向供养：</strong>切断供养 → 镜像反转 → 拿回主动权</div>
+                            <div class="desc"><strong>关机退场：</strong>越挽留他越觉得你不值钱</div>
+                            <div class="desc"><strong>留证威慑：</strong>保留记录，证据在手比撕破脸有效</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;font-size:14px;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:10px;">
+                        反制目的只有两个：<strong style="color:var(--gold);">强制恢复权责对等</strong> 或 <strong style="color:var(--gold);">强制终止关系</strong> —— 不是报复，是止损
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 7: 行为倡议 · 十条契约 ===== -->
+            <div class="slide" data-index="7">
+                <div class="slide-header">
+                    <span class="num">07</span>
+                    <h2>行为倡议 · 十条契约</h2>
+                    <span class="badge">约定</span>
+                </div>
+                <div class="slide-sub">把公理翻译成行为：双方一起签，就是关系的「宪法」</div>
+                <div class="slide-content">
+                    <div class="covenant-grid">
+                        <div class="covenant-item">
+                            <div class="no">1</div>
+                            <div>
+                                <div class="ct">⚖️ 决策与责任对等</div>
+                                <div class="cd">谁决策谁担责，不甩锅、不越权、不背锅</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">2</div>
+                            <div>
+                                <div class="ct">💬 说需求，不指责</div>
+                                <div class="cd">用「我需要…」代替「你总是…」</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">3</div>
+                            <div>
+                                <div class="ct">🛑 情绪可表达，不可攻击</div>
+                                <div class="cd">感受无罪，人身攻击有罪</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">4</div>
+                            <div>
+                                <div class="ct">⏸️ 冲突暂停机制</div>
+                                <div class="cd">约定暗号，情绪过载先暂停，不冷战</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">5</div>
+                            <div>
+                                <div class="ct">🧠 不否定人格与记忆</div>
+                                <div class="cd">只谈此事，不否定对方这个「人」</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">6</div>
+                            <div>
+                                <div class="ct">💰 财务透明，边界清晰</div>
+                                <div class="cd">大事共同决策，各自保留个人空间</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">7</div>
+                            <div>
+                                <div class="ct">📅 每周家庭例会</div>
+                                <div class="cd">定时复盘，问题不过夜、不过周</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">8</div>
+                            <div>
+                                <div class="ct">🌱 独立与依赖平衡</div>
+                                <div class="cd">各自有朋友、兴趣、成长，不互为全部</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">9</div>
+                            <div>
+                                <div class="ct">🔗 不切断求助系统</div>
+                                <div class="cd">保持社交自由，不搞孤立、不搞绑架</div>
+                            </div>
+                        </div>
+                        <div class="covenant-item">
+                            <div class="no">10</div>
+                            <div>
+                                <div class="ct">🎁 爱的语言校准</div>
+                                <div class="cd">定期确认「我怎样爱你，你才收得到」</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SLIDE 8: 总览流程图 ===== -->
+            <div class="slide" data-index="8">
+                <div class="slide-header">
+                    <span class="num">08</span>
+                    <h2>总览 · 完整逻辑链</h2>
+                    <span class="badge">一图看懂</span>
+                </div>
+                <div class="slide-sub">从公理到契约 · 七步闭环</div>
+                <div class="slide-content">
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:6px;">
+                        <div class="flow-row">
+                            <div class="flow-node highlight">⚖️ 谁决策<br>谁担责</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node">💰 物质场</div>
+                            <span class="flow-arrow">↕</span>
+                            <div class="flow-node">❤️ 情感场</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node">🤝🧭✋<br>决策分级</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node">💬 沟通回路<br>+ 需求翻译</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node">🔄 冲突协议<br>红线识别</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node">🛡️ 识别反制<br>应对手册</div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-node green">📜 十条契约</div>
+                        </div>
+                        <div class="flow-row" style="justify-content:center;gap:20px;flex-wrap:wrap;padding-top:4px;">
+                            <span class="flow-label">公理</span>
+                            <span class="flow-label">场域</span>
+                            <span class="flow-label">权责</span>
+                            <span class="flow-label">表达</span>
+                            <span class="flow-label">修复</span>
+                            <span class="flow-label">防御</span>
+                            <span class="flow-label">契约</span>
+                        </div>
+                        <div style="margin-top:12px;text-align:center;font-size:15px;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:14px;">
+                            终极目标：<strong style="color:var(--gold);">把「谁决策，谁担责」从公理变成日常习惯</strong> · 持续校准，永不竣工
+                        </div>
+                        <div style="margin-top:8px;text-align:center;font-size:12px;color:var(--text-muted);">
+                            与《情绪博弈 · 最终模型》互为镜像：诊断篇 → 药方篇
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /slides-wrapper -->
+
+        <!-- ===== 导航栏 ===== -->
+        <div class="nav-bar">
+            <button class="nav-btn" id="prevBtn" aria-label="上一页">←</button>
+            <div class="dots" id="dotsContainer"></div>
+            <div class="nav-right">
+                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌗</button>
+                <span class="page-num" id="pageNum">1 / 9</span>
+                <button class="nav-btn" id="nextBtn" aria-label="下一页">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  导航逻辑
+        // ============================================================
+        const slides = document.querySelectorAll('.slide');
+        const total = slides.length;
+        let current = 0;
+        let isTransitioning = false;
+
+        function goTo(index) {
+            if (isTransitioning) return;
+            if (index < 0) index = 0;
+            if (index >= total) index = total - 1;
+            if (index === current) return;
+            isTransitioning = true;
+            slides.forEach((el, i) => el.classList.toggle('active', i === index));
+            current = index;
+            updateDots();
+            updatePageNum();
+            updateButtons();
+            setTimeout(() => { isTransitioning = false; }, 400);
+        }
+
+        function next() { if (current < total - 1) goTo(current + 1); }
+        function prev() { if (current > 0) goTo(current - 1); }
+
+        function updateDots() {
+            document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+        }
+
+        function updatePageNum() {
+            document.getElementById('pageNum').textContent = `${current+1} / ${total}`;
+        }
+
+        function updateButtons() {
+            document.getElementById('prevBtn').disabled = (current === 0);
+            document.getElementById('nextBtn').disabled = (current === total - 1);
+        }
+
+        function buildDots() {
+            const container = document.getElementById('dotsContainer');
+            container.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.dataset.index = i;
+                dot.addEventListener('click', () => goTo(i));
+                container.appendChild(dot);
+            }
+        }
+
+        // ============================================================
+        //  主题切换
+        // ============================================================
+        function toggleTheme() {
+            document.body.classList.toggle('light');
+        }
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+        // ============================================================
+        //  键盘 + 滚轮事件
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+                e.preventDefault();
+                next();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                prev();
+            }
+        });
+
+        // 滚轮翻页（带防抖）
+        let wheelTimeout = false;
+        document.querySelector('.slides-wrapper').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (wheelTimeout) return;
+            wheelTimeout = true;
+            if (e.deltaY > 0) {
+                next();
+            } else if (e.deltaY < 0) {
+                prev();
+            }
+            setTimeout(() => { wheelTimeout = false; }, 600);
+        }, { passive: false });
+
+        // ============================================================
+        //  初始化
+        // ============================================================
+        buildDots();
+        updatePageNum();
+        updateButtons();
+    </script>
+</body>
+</html>
